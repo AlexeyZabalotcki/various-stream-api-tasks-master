@@ -1,13 +1,10 @@
 package by.zabalotcki;
 
-import by.zabalotcki.model.Animal;
-import by.zabalotcki.model.Car;
-import by.zabalotcki.model.Flower;
-import by.zabalotcki.model.House;
-import by.zabalotcki.model.Person;
+import by.zabalotcki.model.*;
 import by.zabalotcki.util.Util;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 public class Main {
@@ -31,7 +28,13 @@ public class Main {
 
     private static void task1() throws IOException {
         List<Animal> animals = Util.getAnimals();
-        //        animals.stream() Продолжить ...
+        animals.stream()
+                .filter(animal ->
+                        animal.getAge() >= 10 && animal.getAge() <= 20)
+                .sorted(Comparator.comparing(Animal::getAge))
+                .skip(14)
+                .limit(7)
+                .forEach(System.out::println);
     }
 
     private static void task2() throws IOException {
