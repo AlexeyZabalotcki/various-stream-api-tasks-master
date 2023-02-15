@@ -4,11 +4,10 @@ import by.zabalotcki.model.*;
 import by.zabalotcki.util.Util;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -161,11 +160,131 @@ public class Main {
 
     private static void task14() throws IOException {
         List<Car> cars = Util.getCars();
-        //        Продолжить...
+        List<Car> allCars = new ArrayList<>(cars);
+
+        List<Car> stopTurkmenistan = allCars.stream()
+                .filter(car ->
+                        car.getCarMake().equals("Jaguar") || car.getColor().equals("White"))
+                .collect(Collectors.toList());
+
+        int massForTurkmenistan = stopTurkmenistan.stream()
+                .mapToInt(Car::getMass)
+                .sum();
+
+        System.out.println("Price for Turkmenistan " + calculateTransportationCosts(massForTurkmenistan,
+                BigDecimal.valueOf(7.14)) + " $");
+
+        allCars.removeAll(stopTurkmenistan);
+
+        List<Car> stopUzbekistan = allCars.stream()
+                .filter(car ->
+                        car.getMass() < 1500 ||
+                                car.getCarMake().equals("BMW") ||
+                                car.getCarMake().equals("Lexus") ||
+                                car.getCarMake().equals("Chrysler") ||
+                                car.getCarMake().equals("Toyota")
+                )
+                .collect(Collectors.toList());
+
+        int massForUzbekistan = stopUzbekistan.stream()
+                .mapToInt(Car::getMass)
+                .sum();
+
+        System.out.println("Price for Uzbekistan " + calculateTransportationCosts(massForUzbekistan,
+                BigDecimal.valueOf(7.14)) + " $");
+
+        allCars.removeAll(stopUzbekistan);
+
+        List<Car> stopKazakhstan = allCars.stream()
+                .filter(car ->
+                        car.getColor().equals("Dark") ||
+                                car.getColor().equals("Black") &&
+                                        car.getMass() < 4000 ||
+                                car.getCarMake().equals("GMC") ||
+                                car.getCarMake().equals("Dodge")
+
+                )
+                .collect(Collectors.toList());
+
+        int massForKazakhstan = stopKazakhstan.stream()
+                .mapToInt(Car::getMass)
+                .sum();
+
+        System.out.println("Price for Kazakhstan " + calculateTransportationCosts(massForKazakhstan,
+                BigDecimal.valueOf(7.14)) + " $");
+
+        allCars.removeAll(stopKazakhstan);
+
+        List<Car> stopKyrgyzstan = allCars.stream()
+                .filter(car ->
+                        car.getReleaseYear() < 1982 ||
+                                car.getCarModel().equals("Civic") ||
+                                car.getCarModel().equals("Cherokee"))
+                .collect(Collectors.toList());
+
+        int massForKyrgyzstan = stopKyrgyzstan.stream()
+                .mapToInt(Car::getMass)
+                .sum();
+
+        System.out.println("Price for Kyrgyzstan " + calculateTransportationCosts(massForKyrgyzstan,
+                BigDecimal.valueOf(7.14)) + " $");
+
+        allCars.removeAll(stopKyrgyzstan);
+
+        List<Car> stopRussia = allCars.stream()
+                .filter(car ->
+                        !car.getColor().equals("Yellow") &&
+                                !car.getColor().equals("Red") &&
+                                !car.getColor().equals("Green") &&
+                                !car.getColor().equals("Blue") ||
+                                car.getPrice() > 40000
+                )
+                .collect(Collectors.toList());
+
+        int massForRussia = stopRussia.stream()
+                .mapToInt(Car::getMass)
+                .sum();
+
+        System.out.println("Price for Russia " + calculateTransportationCosts(massForRussia,
+                BigDecimal.valueOf(7.14)) + " $");
+
+        allCars.removeAll(stopRussia);
+
+        List<Car> stopMongolia = allCars.stream()
+                .filter(car ->
+                        car.getVin()
+                                .matches(".*59.*"))
+                .collect(Collectors.toList());
+
+        int massForMongolia = stopMongolia.stream()
+                .mapToInt(Car::getMass)
+                .sum();
+
+        System.out.println("Price for Mongolia " + calculateTransportationCosts(massForMongolia,
+                BigDecimal.valueOf(7.14)) + " $");
+
+        allCars.removeAll(stopMongolia);
+
+        List<List<Car>> listCarsOnTrain =
+                Arrays.asList(stopTurkmenistan, stopUzbekistan, stopKazakhstan, stopKyrgyzstan, stopRussia, stopMongolia);
+
+        List<Car> allCarsOnTrain = listCarsOnTrain.stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        int allMass = allCarsOnTrain.stream()
+                .mapToInt(Car::getMass)
+                .sum();
+
+        System.out.println("Total revenue " + calculateTransportationCosts(allMass, BigDecimal.valueOf(7.14)) + " $");
     }
 
     private static void task15() throws IOException {
         List<Flower> flowers = Util.getFlowers();
         //        Продолжить...
+    }
+
+    private static BigDecimal calculateTransportationCosts(int mass, BigDecimal priceForTon) {
+        return priceForTon.multiply(BigDecimal.valueOf(mass));
     }
 }
