@@ -4,6 +4,8 @@ import by.zabalotcki.model.*;
 import by.zabalotcki.util.Util;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -141,7 +143,15 @@ public class Main {
 
     private static void task12() throws IOException {
         List<Person> people = Util.getPersons();
-//        Продолжить...
+        people.stream()
+                .filter(person ->
+                        person.getGender().equals("Male"))
+                .filter(person ->
+                        person.getDateOfBirth().isBefore(LocalDate.now().minus(Period.ofYears(18))) &&
+                                person.getDateOfBirth().isAfter(LocalDate.now().minus(Period.ofYears(27))))
+                .sorted(Comparator.comparing(Person::getRecruitmentGroup))
+                .limit(200)
+                .forEach(System.out::println);
     }
 
     private static void task13() throws IOException {
