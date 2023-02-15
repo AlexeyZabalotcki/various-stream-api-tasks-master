@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -108,7 +109,13 @@ public class Main {
 
     private static void task9() throws IOException {
         List<Animal> animals = Util.getAnimals();
-        //        animals.stream() Продолжить ...
+        int size = animals.stream()
+                .map(animal ->
+                        animal.getBread().chars()
+                                .mapToObj(c -> (char) c)
+                                .collect(Collectors.toList()))
+                .min(Comparator.comparing(List::size)).get().size();
+        System.out.println(size);
     }
 
     private static void task10() throws IOException {
