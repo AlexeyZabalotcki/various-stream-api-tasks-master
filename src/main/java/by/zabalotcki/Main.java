@@ -7,6 +7,14 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,6 +35,7 @@ public class Main {
         task13();
         task14();
         task15();
+        task16("1200394825");
     }
 
     private static void task1() throws IOException {
@@ -155,7 +164,48 @@ public class Main {
 
     private static void task13() throws IOException {
         List<House> houses = Util.getHouses();
-        //        Продолжить...
+
+        List<Person> crossBuildingPeople = houses.stream()
+                .map(House::getPersonList)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        List<Person> peopleFromHospital = houses.stream()
+                .filter(house -> house.getBuildingType().equals("Hospital"))
+                .map(House::getPersonList)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        crossBuildingPeople.removeAll(peopleFromHospital);
+
+        List<Person> youngAndOld = houses.stream()
+                .filter(house ->
+                        house.getBuildingType().equals("Civil building"))
+                .map(House::getPersonList)
+                .flatMap(List::stream)
+                .filter(person ->
+                        person.getGender().equals("Male") &&
+                                person.getDateOfBirth().isAfter(LocalDate.now().minus(Period.ofYears(18))) ||
+                                person.getDateOfBirth().isBefore(LocalDate.now().minus(Period.ofYears(63))) &&
+                                        person.getGender().matches("Female") &&
+                                        person.getDateOfBirth().isAfter(LocalDate.now().minus(Period.ofYears(18))) ||
+                                person.getDateOfBirth().isBefore(LocalDate.now().minus(Period.ofYears(58)))
+                )
+                .collect(Collectors.toList());
+
+        crossBuildingPeople.removeAll(youngAndOld);
+
+        List<List<Person>> firstQueue =
+                Arrays.asList(peopleFromHospital, youngAndOld, crossBuildingPeople);
+
+        List<Person> toEvacuation = firstQueue.stream()
+                .flatMap(List::stream)
+                .limit(500)
+                .collect(Collectors.toList());
+
+        toEvacuation.stream()
+                .limit(500)
+                .forEach(System.out::println);
     }
 
     private static void task14() throws IOException {
@@ -281,7 +331,57 @@ public class Main {
 
     private static void task15() throws IOException {
         List<Flower> flowers = Util.getFlowers();
-        //        Продолжить...
+
+        BigDecimal sum = flowers.stream()
+                .sorted(Comparator.comparing(Flower::getOrigin).reversed())
+                .sorted(Comparator.comparing(Flower::getPrice))
+                .sorted(Comparator.comparing(Flower::getWaterConsumptionPerDay).reversed())
+                .filter(flower ->
+                        flower.getCommonName().matches("^[c-sC-S]+"))
+                .filter(flower ->
+                        flower.isShadePreferred() &&
+                                flower.getFlowerVaseMaterial().stream()
+                                        .anyMatch(f ->
+                                                f.matches("Glass") ||
+                                                        f.matches("Aluminum") ||
+                                                        f.matches("Steel")))
+                .map(flower ->
+                        calculateFullFlowerPriceFor5Years(
+                                flower.getPrice(),
+                                flower.getWaterConsumptionPerDay(),
+                                BigDecimal.valueOf(1.39)))
+                .reduce(BigDecimal.valueOf(0), BigDecimal::add);
+        System.out.println(sum);
+    }
+
+    private static void task16(String num) {
+        num.chars()
+                .mapToObj(c -> (char) c)
+                .collect(Collectors.toList())
+                .stream()
+                .filter(character -> !character.equals('0'))
+                .sorted()
+                .skip(4)
+                .forEach(character -> System.out.println(checkOdd(character)));
+    }
+
+    private static BigDecimal calculateTransportationCosts(int mass, BigDecimal priceForTon) {
+        return priceForTon.multiply(BigDecimal.valueOf(mass));
+    }
+
+    private static BigDecimal calculateFullFlowerPriceFor5Years(int price, double waterConsumptionPerDay, BigDecimal waterCost) {
+        BigDecimal flowerPrice = BigDecimal.valueOf(price);
+
+        int daysIn5Years = 365 * 4 + 366;
+        double waterFlow = Math.round(waterConsumptionPerDay * daysIn5Years);
+        BigDecimal priceOfWaterFor5Years = waterCost.multiply(BigDecimal.valueOf(waterFlow)
+                .round(new MathContext(4, RoundingMode.HALF_EVEN)));
+
+        return flowerPrice.add(priceOfWaterFor5Years);
+    }
+
+    private static boolean checkOdd(char ch) {
+        return ((ch - '0') & 1) != 0;
     }
 
     private static BigDecimal calculateTransportationCosts(int mass, BigDecimal priceForTon) {
