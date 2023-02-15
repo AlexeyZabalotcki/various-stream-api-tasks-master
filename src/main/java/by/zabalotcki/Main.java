@@ -33,6 +33,7 @@ public class Main {
         task13();
         task14();
         task15();
+        task16("1200394825");
     }
 
     private static void task1() throws IOException {
@@ -351,6 +352,17 @@ public class Main {
         System.out.println(sum);
     }
 
+    private static void task16(String num) {
+        num.chars()
+                .mapToObj(c -> (char) c)
+                .collect(Collectors.toList())
+                .stream()
+                .filter(character -> !character.equals('0'))
+                .sorted()
+                .skip(4)
+                .forEach(character -> System.out.println(checkOdd(character)));
+    }
+
     private static BigDecimal calculateTransportationCosts(int mass, BigDecimal priceForTon) {
         return priceForTon.multiply(BigDecimal.valueOf(mass));
     }
@@ -364,5 +376,9 @@ public class Main {
                 .round(new MathContext(4, RoundingMode.HALF_EVEN)));
 
         return flowerPrice.add(priceOfWaterFor5Years);
+    }
+
+    private static boolean checkOdd(char ch) {
+        return ((ch - '0') & 1) != 0;
     }
 }
