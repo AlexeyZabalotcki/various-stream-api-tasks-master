@@ -129,7 +129,14 @@ public class Main {
 
     private static void task11() throws IOException {
         List<Animal> animals = Util.getAnimals();
-        //        animals.stream() Продолжить ...
+        Double averageAge = animals.stream()
+                .filter(animal ->
+                        animal.getOrigin().equals("Indonesian"))
+                .map(Animal::getAge)
+                .mapToDouble(Integer::doubleValue)
+                .average()
+                .getAsDouble();
+        System.out.println(averageAge);
     }
 
     private static void task12() throws IOException {
