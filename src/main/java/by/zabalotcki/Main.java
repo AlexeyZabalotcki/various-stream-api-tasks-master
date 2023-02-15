@@ -6,6 +6,7 @@ import by.zabalotcki.util.Util;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -156,7 +157,48 @@ public class Main {
 
     private static void task13() throws IOException {
         List<House> houses = Util.getHouses();
-        //        Продолжить...
+
+        List<Person> crossBuildingPeople = houses.stream()
+                .map(House::getPersonList)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        List<Person> peopleFromHospital = houses.stream()
+                .filter(house -> house.getBuildingType().equals("Hospital"))
+                .map(House::getPersonList)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        crossBuildingPeople.removeAll(peopleFromHospital);
+
+        List<Person> youngAndOld = houses.stream()
+                .filter(house ->
+                        house.getBuildingType().equals("Civil building"))
+                .map(House::getPersonList)
+                .flatMap(List::stream)
+                .filter(person ->
+                        person.getGender().equals("Male") &&
+                                person.getDateOfBirth().isAfter(LocalDate.now().minus(Period.ofYears(18))) ||
+                                person.getDateOfBirth().isBefore(LocalDate.now().minus(Period.ofYears(63))) &&
+                                        person.getGender().matches("Female") &&
+                                        person.getDateOfBirth().isAfter(LocalDate.now().minus(Period.ofYears(18))) ||
+                                person.getDateOfBirth().isBefore(LocalDate.now().minus(Period.ofYears(58)))
+                )
+                .collect(Collectors.toList());
+
+        crossBuildingPeople.removeAll(youngAndOld);
+
+        List<List<Person>> firstQueue =
+                Arrays.asList(peopleFromHospital, youngAndOld, crossBuildingPeople);
+
+        List<Person> toEvacuation = firstQueue.stream()
+                .flatMap(List::stream)
+                .limit(500)
+                .collect(Collectors.toList());
+
+        toEvacuation.stream()
+                .limit(500)
+                .forEach(System.out::println);
     }
 
     private static void task14() throws IOException {
