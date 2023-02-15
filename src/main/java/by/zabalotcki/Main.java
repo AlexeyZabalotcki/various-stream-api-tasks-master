@@ -81,7 +81,10 @@ public class Main {
 
     private static void task6() throws IOException {
         List<Animal> animals = Util.getAnimals();
-        //        animals.stream() Продолжить ...
+        boolean result = animals.stream()
+                .allMatch(animal ->
+                        animal.getGender().equals("Male") && animal.getGender().equals("Female"));
+        System.out.println(result);
     }
 
     private static void task7() throws IOException {
