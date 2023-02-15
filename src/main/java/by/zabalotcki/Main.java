@@ -103,6 +103,7 @@ public class Main {
                 .limit(100)
                 .max(Comparator.comparing(Animal::getAge));
         System.out.println(max.get().getAge());
+
     }
 
     private static void task9() throws IOException {
