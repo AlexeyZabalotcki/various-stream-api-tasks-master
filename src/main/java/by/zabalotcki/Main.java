@@ -5,6 +5,8 @@ import by.zabalotcki.util.Util;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Period;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -380,5 +382,9 @@ public class Main {
 
     private static boolean checkOdd(char ch) {
         return ((ch - '0') & 1) != 0;
+    }
+
+    private static BigDecimal calculateTransportationCosts(int mass, BigDecimal priceForTon) {
+        return priceForTon.multiply(BigDecimal.valueOf(mass));
     }
 }
