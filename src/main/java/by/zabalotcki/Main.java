@@ -10,12 +10,8 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -35,6 +31,7 @@ public class Main {
         task14();
         task15();
         task16("1200394825");
+        task17();
     }
 
     private static void task1() throws IOException {
@@ -362,6 +359,55 @@ public class Main {
                 .sorted()
                 .skip(4)
                 .forEach(character -> System.out.println(checkOdd(character)));
+    }
+
+    private static void task17() throws IOException {
+        List<Person> people = Util.getPersons();
+        List<Animal> animals = Util.getAnimals();
+
+        Map<Person, Animal> firstSignMap = IntStream.range(0, Math.min(people.size(), animals.size()))
+                .boxed()
+                .collect(Collectors.toMap(
+                        people::get,
+                        animals::get,
+                        (a, b) -> b,
+                        LinkedHashMap::new
+                ))
+                .entrySet()
+                .stream()
+                .mapToDouble(pae -> ((double) LocalDate.now().getYear() - (double) pae.getKey().getDateOfBirth().getYear()) /
+                        (double) pae.getValue().getAge())
+                .mapToInt(number -> (int) (((number + 0.001) * 100) % 100))
+                .boxed()
+                .collect(Collectors.toMap(
+                        people::get,
+                        animals::get,
+                        (a, b) -> b,
+                        LinkedHashMap::new
+                ));
+
+        System.out.println("Matches by first sign: ");
+        firstSignMap.forEach((person, animal) -> System.out.println("Key: " + person + " Value " + animal));
+
+        Map<Person, Animal> secondSignMap = IntStream.range(0, Math.min(people.size(), animals.size()))
+                .boxed()
+                .collect(Collectors.toMap(
+                        people::get,
+                        animals::get,
+                        (a, b) -> b,
+                        LinkedHashMap::new
+                ))
+                .entrySet()
+                .stream()
+                .filter(pea -> pea.getKey().getGender().equals(pea.getValue().getGender()))
+                .filter(pea -> pea.getKey().getDateOfBirth().getMonth().getValue() == pea.getValue().getAge())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                ));
+
+        System.out.println("Matches by second sign: ");
+        secondSignMap.forEach((person, animal) -> System.out.println("Key: " + person + " Value " + animal));
     }
 
     private static BigDecimal calculateTransportationCosts(int mass, BigDecimal priceForTon) {
